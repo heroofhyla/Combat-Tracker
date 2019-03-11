@@ -20,6 +20,7 @@ let Entity = function(name){
 
   me.name = name;
   me.initiative = 0;
+  me.notes = "";
   me.toHTML = function(){
     let entity = document.createElement('div');
     let initiativeBox = document.createElement("input");
@@ -32,6 +33,13 @@ let Entity = function(name){
     entity.appendChild(initiativeBox);
     let nameNode = document.createTextNode(me.name);
     entity.appendChild(nameNode);
+    let notesBox = document.createElement("input");
+    notesBox.type = "text";
+    notesBox.value = me.notes;
+    notesBox.addEventListener("change", function(){
+      me.notes = notesBox.value;
+    });
+    entity.appendChild(notesBox);
     return entity;
   }
 };
