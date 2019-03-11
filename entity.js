@@ -1,6 +1,20 @@
 let Entity = function(name){
   let me = this;
   let subs = {};
+  me.buildInput=function(name, type, doesEmit){
+    let input = document.createElement('input');
+    input.type = type;
+    input.classList.add(name);
+    input.value = me[name];
+    input.addEventListener("change", function(){
+      me[name] = input.value;
+      if (doesEmit){
+        dispatchEvent(new Event("change"));
+      }
+    });
+    return input;
+  }
+
   me.addEventListener = function(channel, sub){
     if (!subs[channel]){
       subs[channel] = [];
@@ -21,25 +35,15 @@ let Entity = function(name){
   me.name = name;
   me.initiative = 0;
   me.notes = "";
+  me.hp = 0;
   me.toHTML = function(){
     let entity = document.createElement('div');
-    let initiativeBox = document.createElement("input");
-    initiativeBox.type="number";
-    initiativeBox.value = me.initiative;
-    initiativeBox.addEventListener("change", function(){
-      me.initiative = parseInt(initiativeBox.value);
-      dispatchEvent(new Event("change"));
-    });
-    entity.appendChild(initiativeBox);
-    let nameNode = document.createTextNode(me.name);
-    entity.appendChild(nameNode);
-    let notesBox = document.createElement("input");
-    notesBox.type = "text";
-    notesBox.value = me.notes;
-    notesBox.addEventListener("change", function(){
-      me.notes = notesBox.value;
-    });
-    entity.appendChild(notesBox);
+    entity.appendChild(me.buildInput("initiative", "number", true));
+    let nameSpan = document.createElement('span');
+    nameSpan.innerHTML = me.name;
+    entity.appendChild(nameSpan);
+    entity.appendChild(me.buildInput("hp", "number", false));
+    entity.appendChild(me.buildInput("notes", "text", false));
     return entity;
   }
 };
