@@ -1,9 +1,37 @@
 let Entity = function(name){
   let me = this;
+  let subs = {};
+  me.addEventListener = function(channel, sub){
+    if (!subs[channel]){
+      subs[channel] = [];
+    }
+    subs[channel].push(sub);
+  };
+
+  let dispatchEvent = function(event){
+    if (!subs[event.type]){
+      return;
+    }
+
+    for (let ii = 0, imax = subs[event.type].length; ii < imax; ii++){
+      subs[event.type][ii](event);
+    }
+  };
+
   me.name = name;
+  me.initiative = 0;
   me.toHTML = function(){
     let entity = document.createElement('div');
-    entity.innerHTML = me.name;
+    let initiativeBox = document.createElement("input");
+    initiativeBox.type="number";
+    initiativeBox.value = me.initiative;
+    initiativeBox.addEventListener("change", function(){
+      me.initiative = parseInt(initiativeBox.value);
+      dispatchEvent(new Event("change"));
+    });
+    entity.appendChild(initiativeBox);
+    let nameNode = document.createTextNode(me.name);
+    entity.appendChild(nameNode);
     return entity;
   }
 };
@@ -13,9 +41,13 @@ let EntitySet = function(redrawHandler){
   let collection = [];
   me.push = function(entity){
     collection.push(entity);
+    entity.addEventListener("change", function(event){
+      redrawHandler.redraw(me);
+    });
   }
 
   me.toHTML = function(){
+    collection.sort(function(a, b){ return b.initiative - a.initiative});
     let ret = document.createElement('ul');
     for(let ii = 0, imax = collection.length; ii < imax; ii++){
       let li = document.createElement('li');
