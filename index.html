@@ -8,8 +8,16 @@
     <script src="entity.js" defer></script> 
     <script src="combat.js" defer></script>
     <form id="new-entity-form">
+      <label for="entity-name">New entity name</label>
       <input type="text" id="entity-name" name="entity-name">
       <input type="submit" value="create">
+    </form>
+    <form id="turn-control-form">
+      <label for="initiative-point">Current initiative point</label>
+      <input type="number" id="initiative-point" 
+             name="initiative-point" value=40>
+      <button id="initiative-top">Top</button>
+      <button id="initiative-next">Next</button>
     </form>
     <div id="entity-view">
     </div>

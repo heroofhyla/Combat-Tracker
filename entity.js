@@ -49,7 +49,18 @@ let Entity = function(name){
     entity.appendChild(me.buildInput("hp", "number", false));
     entity.appendChild(me.buildInput("notes", "text", false));
     return entity;
-  }
+  };
+
+  me.roundInitiative = function(initiativePoint, initiativeSize){
+    console.log("Checking " + me.name + " initiative...");
+    if (me.initiative <= initiativePoint){
+      console.log("Haven't passed my initiative point yet. " + me.initiative);
+      return me.initiative;
+    }
+    console.log("We've passed me in the initiative. "
+                + (me.initiative - initiativeSize));
+    return me.initiative - initiativeSize;
+  };
 };
 
 let EntitySet = function(redrawHandler){
@@ -60,10 +71,23 @@ let EntitySet = function(redrawHandler){
     entity.addEventListener("change", function(event){
       redrawHandler.redraw(me);
     });
-  }
+  };
 
-  me.toHTML = function(){
-    collection.sort(function(a, b){ return b.initiative - a.initiative});
+  me.nextInitiative = function(){
+    return collection[1].initiative;
+  };
+
+  me.toHTML = function(initiativePoint){
+    console.log("Rendering the list of entities...");
+    console.log("Sorting...");
+    collection.sort(function(a, b){ 
+      return (
+        b.roundInitiative(initiativePoint, me.initiativeSize()) 
+        - 
+        a.roundInitiative(initiativePoint, me.initiativeSize())
+      )
+    });
+    console.log("Sorting done");
     let ret = document.createElement('ul');
     for(let ii = 0, imax = collection.length; ii < imax; ii++){
       let li = document.createElement('li');
@@ -80,4 +104,10 @@ let EntitySet = function(redrawHandler){
     }
     return ret;
   }
+
+  me.initiativeSize = function(){
+    let initSize = Math.max(...collection.map(function(e){return e.initiative;}));
+    console.log("Initiative size: " + initSize);
+    return initSize;
+  };
 };
